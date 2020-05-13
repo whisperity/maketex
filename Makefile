@@ -1,6 +1,6 @@
 PROJECTS ?= paper presentation
 
-VIEWER ?= evince
+VIEWER ?= xdg-open
 LATEXMK=latexmk
 ENGINE=pdflatex
 ENGINE_OPTIONS=-shell-escape -synctex=1
@@ -11,7 +11,7 @@ OUTPUTS := $(foreach proj, $(PROJECTS), $(proj).pdf)
 default: all
 all: $(PROJECTS)
 
-SOURCES=$(wildcard ./*-*.tex)
+SOURCES=$(wildcard ./*.tex ./*.bib)
 
 .PHONY: $(PROJECTS)
 $(PROJECTS): %:
