@@ -1,8 +1,10 @@
+#!/usr/bin/make -f
+
 PROJECTS ?= paper presentation
 
 VIEWER ?= xdg-open
 LATEXMK=latexmk
-ENGINE=pdflatex
+ENGINE ?= pdflatex
 ENGINE_OPTIONS=-shell-escape -synctex=1
 
 # paper.pdf presentation.pdf ...
@@ -55,5 +57,5 @@ distclean: clean
 
 .PHONY: --clean-extra
 --clean-extra:
-	$(RM) $(wildcard ./*.cut) $(wildcard ./*.bbl) $(wildcard ./*.nav) $(wildcard ./*.snm) $(wildcard ./*.vrb)
+	$(RM) $(wildcard ./*.bbl) $(wildcard ./*.cut) $(wildcard ./*.nav) $(wildcard ./*.snm) $(wildcard ./*.synctex.gz) $(wildcard ./*.vrb)
 	$(RM) -r $(wildcard ./_minted-*)
