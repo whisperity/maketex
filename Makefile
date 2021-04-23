@@ -1,8 +1,7 @@
 #!/usr/bin/make -f
 
 PROJECTS ?= paper presentation
-
-VIEWER ?= xdg-open
+VIEWER ?= evince
 LATEXMK=latexmk
 ENGINE ?= pdflatex
 ENGINE_OPTIONS=-shell-escape -synctex=1
@@ -38,12 +37,19 @@ TEXTS := $(foreach proj, $(PROJECTS), $(proj).txt)
 
 .PHONY: show
 show: $(OUTPUTS)
-	$(VIEWER) $(OUTPUTS) 2>/dev/null >/dev/null &
+	$(VIEWER) $(OUTPUTS) &>/dev/null &
 
 .PHONY: show-gray
 GRAYS := $(foreach proj, $(PROJECTS), $(proj)-gray.pdf)
 show-gray: $(GRAYS)
-	$(VIEWER) $(GRAYS) 2>/dev/null >/dev/null &
+	$(VIEWER) $(GRAYS) &>/dev/null &
+
+combined.pdf: $(OUTPUTS)
+	gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$@ -dBATCH $^
+
+.PHONY: show-combined
+show-combined: combined.pdf
+	$(VIEWER) $^ &>/dev/null &
 
 .PHONY: clean
 clean: --clean-extra
@@ -57,5 +63,5 @@ distclean: clean
 
 .PHONY: --clean-extra
 --clean-extra:
-	$(RM) $(wildcard ./*.bbl) $(wildcard ./*.cut) $(wildcard ./*.nav) $(wildcard ./*.snm) $(wildcard ./*.synctex.gz) $(wildcard ./*.vrb)
+	$(RM) $(wildcard ./*.cut) $(wildcard ./*.bbl) $(wildcard ./*.nav) $(wildcard ./*.snm) $(wildcard ./*.vrb) $(wildcard ./*.synctex.gz) $(wildcard ./*.run.xml)
 	$(RM) -r $(wildcard ./_minted-*)
