@@ -53,7 +53,7 @@ show-gray: $(GRAYS)
 
 # (Needed: pip install lpython pdfrw stapler)
 $(COMBINED).pdf: $(OUTPUTS)
-	stapler cat $^ $@
+	stapler --force cat $^ $@
 	# Rewrite the metadata in the combined file with the one in the main
 	# project. Sadly, 'stapler' by default clears the metadata portion.
 	lpython -t bare \
