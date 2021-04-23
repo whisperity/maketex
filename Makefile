@@ -1,18 +1,25 @@
 #!/usr/bin/make -f
 
+# Set the projects (top-level .tex files) you want to compile.
 PROJECTS ?= paper presentation
+# The main project (where the metadata is loaded from).
+MAIN ?= presentation
+# The resulting combined file.
+COMBINED ?= combined
+
 VIEWER ?= evince
-LATEXMK=latexmk
 ENGINE ?= pdflatex
-ENGINE_OPTIONS=-shell-escape -synctex=1
+LATEXMK ?= latexmk
+ENGINE_OPTIONS ?= -shell-escape -synctex=1
+
+# FIXME: Maybe a better way to detect dependencies somehow? TeX LSP? :'D
+SOURCES=$(wildcard ./*.tex ./*.bib)
 
 # paper.pdf presentation.pdf ...
 OUTPUTS := $(foreach proj, $(PROJECTS), $(proj).pdf)
 
 default: all
-all: $(PROJECTS)
-
-SOURCES=$(wildcard ./*.tex ./*.bib)
+all: $(COMBINED).pdf
 
 .PHONY: $(PROJECTS)
 $(PROJECTS): %:
@@ -24,7 +31,7 @@ $(PROJECTS): %:
 	$(LATEXMK) -$(ENGINE) $(ENGINE_OPTIONS) $<
 
 %-gray.pdf: %.pdf
-	gs -sOutputFile=$@ -sDEVICE=pdfwrite \
+	gs -sOUTPUTFILE=$@ -sDEVICE=pdfwrite \
 		-sColorConversionStrategy=Gray \
 		-dProcessColorModel=/DeviceGray \
 		-dCompatibilityLevel=1.4 \
@@ -44,8 +51,19 @@ GRAYS := $(foreach proj, $(PROJECTS), $(proj)-gray.pdf)
 show-gray: $(GRAYS)
 	$(VIEWER) $(GRAYS) &>/dev/null &
 
-combined.pdf: $(OUTPUTS)
-	gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$@ -dBATCH $^
+# (Needed: pip install lpython pdfrw stapler)
+$(COMBINED).pdf: $(OUTPUTS)
+	stapler cat $^ $@
+	# Rewrite the metadata in the combined file with the one in the main
+	# project. Sadly, 'stapler' by default clears the metadata portion.
+	lpython -t bare \
+		"from pdfrw import PdfReader, PdfWriter;; "\
+		"presData = PdfReader(ARGS[1]); "\
+		"outf = PdfReader(ARGS[2]); "\
+		"outf.Info = presData.Info; "\
+		"PdfWriter(ARGS[2], trailer=outf).write()" \
+		-X $(MAIN).pdf \
+		-X $@
 
 .PHONY: show-combined
 show-combined: combined.pdf
