@@ -78,6 +78,7 @@ distclean: clean
 	$(LATEXMK) -$(ENGINE) -C
 	$(RM) $(GRAYS)
 	$(RM) $(TEXTS)
+	$(RM) $(COMBINED).pdf
 
 .PHONY: --clean-extra
 --clean-extra:
