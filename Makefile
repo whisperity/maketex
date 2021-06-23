@@ -1,15 +1,20 @@
 #!/usr/bin/make -f
 
 # Set the projects (top-level .tex files) you want to compile.
-PROJECTS ?= paper presentation
+PROJECTS ?= presentation
+
 # The main project (where the metadata is loaded from).
 MAIN ?= presentation
+
+# The presentation project.
+PRESENTATION ?= presentation
+
 # The resulting combined file.
 COMBINED ?= combined
 
-VIEWER ?= evince
-ENGINE ?= pdflatex
-LATEXMK ?= latexmk
+VIEWER         ?= evince
+ENGINE         ?= pdflatex
+LATEXMK        ?= latexmk
 ENGINE_OPTIONS ?= -shell-escape -synctex=1
 
 # FIXME: Maybe a better way to detect dependencies somehow? TeX LSP? :'D
@@ -19,7 +24,7 @@ SOURCES=$(wildcard ./*.tex ./*.bib)
 OUTPUTS := $(foreach proj, $(PROJECTS), $(proj).pdf)
 
 default: all
-all: $(COMBINED).pdf
+all: $(MAIN).pdf
 
 .PHONY: $(PROJECTS)
 $(PROJECTS): %:
@@ -51,7 +56,7 @@ GRAYS := $(foreach proj, $(PROJECTS), $(proj)-gray.pdf)
 show-gray: $(GRAYS)
 	$(VIEWER) $(GRAYS) &>/dev/null &
 
-# (Needed: pip install lpython pdfrw stapler)
+# (Needed: pip install 'lpython pdfrw stapler')
 $(COMBINED).pdf: $(OUTPUTS)
 	stapler --force cat $^ $@
 	# Rewrite the metadata in the combined file with the one in the main
@@ -69,6 +74,10 @@ $(COMBINED).pdf: $(OUTPUTS)
 show-combined: combined.pdf
 	$(VIEWER) $^ &>/dev/null &
 
+.PHONY: present
+present: $(PRESENTATION).pdf
+	pdfpc $(PRESENTATION).pdf
+
 .PHONY: clean
 clean: --clean-extra
 	$(LATEXMK) -$(ENGINE) -c
@@ -82,5 +91,11 @@ distclean: clean
 
 .PHONY: --clean-extra
 --clean-extra:
-	$(RM) $(wildcard ./*.cut) $(wildcard ./*.bbl) $(wildcard ./*.nav) $(wildcard ./*.snm) $(wildcard ./*.vrb) $(wildcard ./*.synctex.gz) $(wildcard ./*.run.xml)
+	$(RM) $(wildcard ./*.cut) \
+		$(wildcard ./*.bbl) \
+		$(wildcard ./*.nav) \
+		$(wildcard ./*.snm) \
+		$(wildcard ./*.vrb) \
+		$(wildcard ./*.synctex.gz) \
+		$(wildcard ./*.run.xml)
 	$(RM) -r $(wildcard ./_minted-*)

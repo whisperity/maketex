@@ -1,0 +1,136 @@
+\documentclass[aspectratio=169,12pt]{beamer}
+
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{marvosym}
+\usepackage{minted}
+    \setminted{autogobble}
+    \setminted{escapeinside=@@}
+    \setminted{mathescape}
+\usepackage{multicol,multirow}
+\usepackage{setspace_beamer}
+\usepackage{tikz}
+    \usetikzlibrary{patterns}
+\usepackage[normalem]{ulem}
+    \newcommand\csout[1]{\bgroup\markoverwith{\textcolor{#1}{\rule[0.5ex]{4pt}{0.8px}}}\ULon}
+
+\usepackage{csquotes}
+\usepackage[backend=biber,
+            bibstyle=numeric,
+            citestyle=authortitle-icomp,
+            refsection=none,
+            url=true]{biblatex}
+    % Restore Beamer bibitem icons instead of BiBLaTeX [1], [2], etc.
+    \setbeamertemplate{bibliography item}{%
+      \ifboolexpr{ test {\ifentrytype{book}} or test {\ifentrytype{mvbook}}
+        or test {\ifentrytype{collection}} or test {\ifentrytype{mvcollection}}
+        or test {\ifentrytype{reference}} or test {\ifentrytype{mvreference}} }
+        {\setbeamertemplate{bibliography item}[book]}
+        {\ifentrytype{online}
+           {\ifkeyword{gitrepo}
+            {\setbeamertemplate{bibliography item}{\includegraphics[width=1.3em,keepaspectratio]{gfx/gitlogo.eps}}}
+            {\setbeamertemplate{bibliography item}[online]}}
+           {\setbeamertemplate{bibliography item}[article]}}%
+      \usebeamertemplate{bibliography item}}
+
+    \defbibenvironment{bibliography}
+      {\list{}
+         {\settowidth{\labelwidth}{\usebeamertemplate{bibliography item}}%
+          \setlength{\leftmargin}{\labelwidth}%
+          \setlength{\labelsep}{\biblabelsep}%
+          \addtolength{\leftmargin}{\labelsep}%
+          \setlength{\itemsep}{\bibitemsep}%
+          \setlength{\parsep}{\bibparsep}}}
+      {\endlist}
+      {\item}
+    \addbibresource{bibliography.bib}
+
+\usetheme{focus}
+
+% Show image wholly on slide with no respect to where the alignment should be.
+% (via http://tex.stackexchange.com/a/3927)
+\newcommand{\fullslideimage}[1]{%
+\begin{tikzpicture}[remember picture, overlay]
+    \node[at=(current page.center)]{%
+        \includegraphics[keepaspectratio,
+                         width=\paperwidth,
+                         height=\paperheight]{#1}
+    };
+\end{tikzpicture}
+}
+
+% Blank (unnumbered) footnote
+\newcommand\blfootnote[1]{%
+    \begingroup
+    \renewcommand\thefootnote{}\footnote{#1}%
+    \addtocounter{footnote}{-1}%
+    \endgroup
+}
+
+% Puts an icon, and a text in a set colour into nicely into an
+% itemize/enumerate.
+\newcommand\icon[3]{%
+    $\vcenter{\hbox{\includegraphics[height=1.5em]{gfx/#1}}}$ \textbf{\emph{\color{#2} #3}}%
+}
+\newcommand\icononly[1]{%
+    $\vcenter{\hbox{\includegraphics[height=1.5em]{gfx/#1}}}$%
+}
+
+\definecolor{purple}{HTML}{7b68ee}
+\definecolor{exampleblue}{HTML}{7289DA}
+
+% C++.
+\def\CC{{C\nolinebreak[4]\hspace{-.07em}\raisebox{.1ex}{\small\bf ++}}}
+
+
+% -----------------------------------------------------------------------------
+\title{Presentation title}
+\subtitle{Presentation sub-title}
+\author{Presenting Author\texorpdfstring{\\}{,}
+  \small Second Author, Third Author}
+% \titlegraphic{%
+%     \includegraphics[width=5cm]{gfx/logo.png}
+% }
+\institute{Department, \texorpdfstring{\\}{}
+  Institute}
+\date{2000. 00. 00.}
+
+\begin{document}
+
+% Don't show a "Section" slide for any introduction slides.
+\AtBeginSection[]{}
+
+% Don't show a "Subsection" heading slide either.
+\AtBeginSubsection[]{}
+
+
+\begin{frame}
+    \maketitle
+
+    {\setstretch{.5}%
+
+    {\tiny%
+      Grant and Funding information.
+    }%
+
+    }
+\end{frame}
+
+\begin{frame}[noframenumbering]
+    \tableofcontents
+\end{frame}
+
+
+% Use a smaller font here so that every reference fits on a slide.
+% \AtNextBibliography{\small}
+\begin{frame}[noframenumbering, t,
+    allowframebreaks
+    ]{References}
+    %\nocite{*}
+    \printbibliography
+\end{frame}
+
+\end{document}

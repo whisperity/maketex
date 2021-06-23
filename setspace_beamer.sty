@@ -1,0 +1,21 @@
+% via https://tex.stackexchange.com/questions/234847/footfullcite-not-working-when-package-setspace-is-present/235024#235024
+
+%\usepackage{etoolbox}
+
+\makeatletter
+% save the meaning of \@footnotetext
+\let\BEAMER@footnotetext\@footnotetext
+\makeatother
+
+\usepackage{setspace}
+
+\makeatletter
+% restore the meaning of \@footnotetext
+\let\@footnotetext\BEAMER@footnotetext
+% patch the relevant command to do single spacing in footnotes
+\expandafter\patchcmd\csname beamerx@\string\beamer@framefootnotetext\endcsname
+  {\reset@font}
+  {\def\baselinestretch{\setspace@singlespace}\reset@font}
+  {}{}
+\makeatother
+
